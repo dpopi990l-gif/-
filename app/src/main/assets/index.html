@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>قصص وحكايات</title>
+<style>
+:root{
+  --bg:#fdf6e9; --card:#ffffff; --ink:#3b2a1a; --muted:#8a7660;
+  --accent:#d9662b; --accent2:#2f8f83; --line:#eadcc3; --shadow:0 4px 14px rgba(90,60,20,.12);
+}
+body.night{
+  --bg:#14171f; --card:#1e2330; --ink:#ece6da; --muted:#a09a8c;
+  --accent:#f09a5b; --accent2:#5fc7b8; --line:#2c3344; --shadow:0 4px 14px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);
+  font-family:"Noto Naskh Arabic","Droid Arabic Naskh","Segoe UI",Tahoma,sans-serif;overflow:hidden}
+button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+#app{height:100%;display:flex;flex-direction:column}
+
+/* splash */
+#splash{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(160deg,#d9662b,#8e3b1a 60%,#3a1c0d);color:#fff;text-align:center;transition:opacity .6s}
+#splash.hide{opacity:0;pointer-events:none}
+#splash .moon{font-size:84px;animation:float 3s ease-in-out infinite}
+#splash h1{font-size:38px;margin:10px 0 4px}
+#splash p{margin:0;opacity:.85;font-size:17px}
+#splash .credit{position:absolute;bottom:38px;font-size:16px;letter-spacing:.3px}
+#splash .credit b{display:block;font-size:22px;margin-top:4px;color:#ffe2a8}
+@keyframes float{50%{transform:translateY(-12px)}}
+
+/* header */
+header{padding:16px 16px 10px;background:linear-gradient(135deg,var(--accent),#b9471a);color:#fff;
+  border-radius:0 0 26px 26px;box-shadow:var(--shadow);flex:none}
+.top{display:flex;align-items:center;justify-content:space-between}
+.top h2{margin:0;font-size:24px}
+.icons button{font-size:22px;padding:6px 9px;color:#fff}
+.search{margin-top:10px;display:flex;background:rgba(255,255,255,.95);border-radius:14px;padding:0 12px;align-items:center}
+.search input{flex:1;border:0;outline:0;background:none;padding:11px 6px;font:inherit;font-size:16px;color:#3b2a1a}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:12px 2px 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:7px 15px;border-radius:20px;background:rgba(255,255,255,.2);color:#fff;font-size:15px}
+.chip.on{background:#fff;color:var(--accent);font-weight:700}
+
+/* list */
+main{flex:1;overflow-y:auto;padding:16px 14px 90px}
+.grid{display:grid;grid-template-columns:1fr;gap:14px}
+.card{display:flex;gap:14px;background:var(--card);border-radius:18px;padding:14px;box-shadow:var(--shadow);
+  align-items:center;border:1px solid var(--line);text-align:right;width:100%}
+.card:active{transform:scale(.98)}
+.emoji{flex:none;width:64px;height:64px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:34px}
+.card h3{margin:0 0 4px;font-size:19px}
+.card .meta{font-size:13px;color:var(--muted)}
+.card .sum{font-size:14px;color:var(--muted);margin-top:4px;line-height:1.6}
+.fav{margin-inline-start:auto;font-size:22px;color:var(--muted)}
+.fav.on{color:#e0344b}
+.empty{text-align:center;color:var(--muted);padding:50px 20px;font-size:17px;line-height:1.9}
+.foot{text-align:center;color:var(--muted);font-size:13px;margin:26px 0 0}
+.foot b{color:var(--accent)}
+
+/* nav */
+nav{position:fixed;bottom:0;inset-inline:0;display:flex;background:var(--card);border-top:1px solid var(--line);
+  padding:6px 0 8px;z-index:5}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;font-size:12.5px;color:var(--muted);gap:2px}
+nav button span{font-size:22px}
+nav button.on{color:var(--accent);font-weight:700}
+
+/* reader */
+#reader{position:fixed;inset:0;background:var(--bg);z-index:20;display:none;flex-direction:column}
+#reader.open{display:flex;animation:slide .25s}
+@keyframes slide{from{transform:translateX(-40px);opacity:0}}
+.rbar{display:flex;align-items:center;gap:6px;padding:12px 10px;background:var(--card);border-bottom:1px solid var(--line)}
+.rbar .t{flex:1;font-weight:700;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rbar button{font-size:21px;padding:6px 9px}
+.rbody{flex:1;overflow-y:auto;padding:22px 20px 60px}
+.rbody .hero{text-align:center;font-size:72px}
+.rbody h1{text-align:center;font-size:27px;margin:8px 0 4px}
+.rbody .by{text-align:center;color:var(--muted);font-size:14px;margin-bottom:20px}
+.rbody p{line-height:2.1;margin:0 0 16px;text-align:justify}
+.moral{margin-top:26px;padding:16px;border-radius:16px;background:var(--card);border:2px dashed var(--accent);line-height:1.9}
+.moral b{color:var(--accent)}
+.rfoot{text-align:center;margin-top:26px;color:var(--muted);font-size:14px}
+.rfoot b{color:var(--accent)}
+
+/* modal */
+#about{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:40;display:none;align-items:center;justify-content:center;padding:26px}
+#about.open{display:flex}
+.box{background:var(--card);border-radius:24px;padding:26px 22px;text-align:center;max-width:360px;width:100%}
+.box .big{font-size:56px}
+.box h3{margin:6px 0}
+.box .dev{margin:16px 0 4px;padding:14px;border-radius:16px;background:linear-gradient(135deg,var(--accent),#b9471a);color:#fff}
+.box .dev small{display:block;opacity:.85}
+.box .dev b{font-size:23px}
+.box .close{margin-top:16px;padding:10px 28px;border-radius:14px;background:var(--accent2);color:#fff;font-size:16px}
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div class="moon">🌙</div>
+  <h1>قصص وحكايات</h1>
+  <p>حكايات قبل النوم تُنير الخيال</p>
+  <div class="credit">تصميم<b>مجاهد العزي</b></div>
+</div>
+
+<div id="app">
+  <header>
+    <div class="top">
+      <h2>📖 قصص وحكايات</h2>
+      <div class="icons">
+        <button onclick="toggleNight()" aria-label="الوضع الليلي" id="nightBtn">🌙</button>
+        <button onclick="openAbout()" aria-label="حول التطبيق">ℹ️</button>
+      </div>
+    </div>
+    <div class="search"><span>🔍</span><input id="q" placeholder="ابحث عن قصة..." oninput="render()"></div>
+    <div class="chips" id="chips"></div>
+  </header>
+  <main id="list"></main>
+  <nav>
+    <button id="navAll" class="on" onclick="setTab('all')"><span>🏠</span>القصص</button>
+    <button id="navFav" onclick="setTab('fav')"><span>❤️</span>المفضلة</button>
+    <button onclick="randomStory()"><span>🎲</span>قصة عشوائية</button>
+  </nav>
+</div>
+
+<div id="reader">
+  <div class="rbar">
+    <button onclick="closeReader()" aria-label="رجوع">➡️</button>
+    <div class="t" id="rtitle"></div>
+    <button onclick="fontSize(-1)" aria-label="تصغير الخط">أ-</button>
+    <button onclick="fontSize(1)" aria-label="تكبير الخط">أ+</button>
+    <button id="rfav" onclick="toggleFav(cur)" aria-label="مفضلة">🤍</button>
+  </div>
+  <div class="rbody" id="rbody"></div>
+</div>
+
+<div id="about" onclick="if(event.target===this)closeAbout()">
+  <div class="box">
+    <div class="big">📚</div>
+    <h3>قصص وحكايات</h3>
+    <div style="color:var(--muted);font-size:14px">الإصدار 1.0 — يعمل بدون إنترنت</div>
+    <div class="dev"><small>تصميم</small><b>مجاهد العزي</b></div>
+    <button class="close" onclick="closeAbout()">إغلاق</button>
+  </div>
+</div>
+
+<script>
+const CATS=["الكل","حكايات الحيوان","قصص الحكمة","قصص الأطفال"];
+const COLORS=["#ffe4cf","#d9f2ee","#fde8ee","#e7e9ff","#fff3c4","#e3f5d3"];
+
+const STORIES=[
+{id:1,cat:"حكايات الحيوان",emoji:"🦁",title:"الأسد والفأر",time:2,
+ summary:"فأر صغير ينقذ ملك الغابة.",
+ text:[
+ "في غابة كثيفة الأشجار، كان الأسد نائماً تحت ظل شجرة عالية. وبينما كان يغطّ في نومه، جرى فأر صغير فوق ظهره دون أن ينتبه، فاستيقظ الأسد غاضباً وأمسك به بمخلبه الكبير.",
+ "ارتجف الفأر وقال: «سامحني يا مولاي، فلعلّي أردّ لك الجميل يوماً ما». ضحك الأسد من كلامه وقال: «أنت صغير جداً حتى تنفعني!» لكنه أشفق عليه وتركه يمضي.",
+ "بعد أيام وقع الأسد في شبكة قوية نصبها الصيادون، وراح يزأر ويتخبط دون فائدة. سمع الفأر الزئير فأسرع إليه، وبدأ يقضم الحبال بأسنانه الصغيرة حبلاً بعد حبل حتى تحرّر الأسد.",
+ "نظر الأسد إلى الفأر بامتنان وقال: «ما كنت أظن أن صغيراً مثلك ينقذ ملكاً مثلي». فابتسم الفأر وقال: «ألم أقل لك إنني سأردّ الجميل؟»"],
+ moral:"لا تحتقر أحداً لصغر حجمه، فالمعروف لا يضيع، وقد ينفعك الصغير حين يعجز الكبير."},
+
+{id:2,cat:"قصص الحكمة",emoji:"🐢",title:"السلحفاة والأرنب",time:3,
+ summary:"سباق يعلّمنا قيمة المثابرة.",
+ text:[
+ "كان في المرج أرنب سريع يتباهى كل يوم بسرعته ويسخر من السلحفاة البطيئة قائلاً: «لن تصلي إلى شجرة البلوط قبل أن أعود من رحلتي مرتين!»",
+ "غضبت السلحفاة بهدوء وقالت: «فلنتسابق إذن». اجتمعت الحيوانات لتشاهد، وانطلق الأرنب كالسهم حتى غاب عن الأنظار، بينما مشت السلحفاة خطوة ثابتة بعد خطوة.",
+ "حين تقدّم الأرنب كثيراً، التفت فلم يجد منافسته، فقال في نفسه: «لديّ وقت طويل، سأرتاح قليلاً». وتمدد تحت شجرة ظليلة ونام نوماً عميقاً.",
+ "أما السلحفاة فلم تتوقف لحظة. مشت وصبرت وتعبت لكنها واصلت، حتى اقتربت من خط النهاية. استيقظ الأرنب على هتاف الحيوانات فركض بأقصى سرعته، لكن السلحفاة كانت قد لمست الشجرة قبله."],
+ moral:"المثابرة والاستمرار أفضل من السرعة والغرور، ومن سار على الدرب وصل."},
+
+{id:3,cat:"حكايات الحيوان",emoji:"🦊",title:"الثعلب والغراب",time:2,
+ summary:"قطعة جبن تكشف خدعة المديح.",
+ text:[
+ "وجد غراب قطعة جبن لذيذة فحملها بمنقاره وطار إلى غصن عالٍ ليأكلها بهدوء.",
+ "رآه ثعلب جائع من تحت الشجرة فسال لعابه، وفكّر في حيلة. قال بصوت ناعم: «ما أجمل ريشك يا سيد غراب! ولا شك أن صوتك أجمل منه، فغنِّ لي أغنية قصيرة!»",
+ "أعجب الغراب بالمديح وانتفخ صدره فخراً، وفتح منقاره ليصيح «قا قا قا»، فسقطت قطعة الجبن على الأرض.",
+ "التقطها الثعلب بسرعة وقال وهو يبتعد: «شكراً لك على الوجبة، وعلى الدرس أيضاً: لا تصدّق كل من يمدحك!»"],
+ moral:"احذر من المديح المبالغ فيه، فقد يكون وراءه من يريد خداعك."},
+
+{id:4,cat:"قصص الأطفال",emoji:"🐜",title:"النملة النشيطة",time:2,
+ summary:"من يتعب في الصيف يرتاح في الشتاء.",
+ text:[
+ "في يوم صيفي مشمس، كانت النملة «نور» تحمل حبات القمح إلى بيتها تحت الأرض، وكان صرصور يغني ويقفز في الحقل ويقول: «تعالي والعبي معي! الدنيا جميلة!»",
+ "ابتسمت نور وقالت: «سألعب معك بعد أن أنتهي، فالشتاء قادم ويجب أن نجهّز طعامنا». ضحك الصرصور وقال: «الشتاء بعيد، ما زال أمامنا وقت طويل!»",
+ "مرّت الأيام وجاء الشتاء بريحه الباردة وثلوجه، وأصبح الحقل أبيض خالياً من الطعام. جاع الصرصور وبرد جسده، فطرق باب النملة وقال بخجل: «هل لديك لقمة تسدّ جوعي؟»",
+ "فتحت نور الباب بقلب طيب وأعطته من مخزونها، وقالت: «تفضّل، لكن عدني أن تعمل معنا في الصيف القادم». ووعد الصرصور وفي الصيف التالي كان أول من جمع الحبوب."],
+ moral:"العمل في وقته يجنّبنا الندم لاحقاً، والطيبة مع المخطئ تعلّمه أكثر من العتاب."},
+
+{id:5,cat:"قصص الحكمة",emoji:"🌳",title:"الأخوة والحزمة",time:2,
+ summary:"الاتحاد قوة لا تُكسر.",
+ text:[
+ "كان لرجل عجوز أربعة أبناء، لا يكاد يمرّ يوم دون أن يتشاجروا على أتفه الأمور، فحزن الأب كثيراً وفكّر في طريقة تعلّمهم.",
+ "ذات صباح جمع أولاده وأحضر حزمة من العصي المربوطة معاً، وقال: «من يستطيع أن يكسر هذه الحزمة فله جائزة». حاول الأول بكل قوته فلم يستطع، وحاول الثاني والثالث والرابع فعجزوا جميعاً.",
+ "فتح الأب الحزمة وأعطى كل واحد منهم عصا واحدة وقال: «اكسرها الآن». فكسر كل واحد عصاه بسهولة ودهشة.",
+ "ابتسم الأب وقال: «يا أبنائي، حين تكونون معاً لا يقدر عليكم أحد، وحين تتفرقون يكسركم أضعف الناس». فتصالح الأبناء ولم يتخاصموا بعد ذلك اليوم."],
+ moral:"في الاتحاد قوة، وفي الفرقة ضعف."},
+
+{id:6,cat:"قصص الأطفال",emoji:"⭐",title:"النجمة الصغيرة",time:3,
+ summary:"نجمة تبحث عن ضوئها الخاص.",
+ text:[
+ "في سماء واسعة مليئة بالنجوم، كانت هناك نجمة صغيرة اسمها «لُجين» تحزن كل ليلة لأن ضوءها خافت أمام النجوم الكبيرة اللامعة. كانت تقول: «لا أحد يراني، فما فائدتي؟»",
+ "في ليلة مظلمة بلا قمر، ضلّ صيّاد صغير طريقه في الصحراء، وكان خائفاً يبحث عن أي ضوء يدلّه. رفع رأسه إلى السماء، فرأى ضوءاً صغيراً ثابتاً ينبض بلطف: إنها لجين.",
+ "قال الصياد بصوت فرح: «هذه النجمة تقع فوق قريتنا تماماً!» وسار خلف ضوئها حتى وصل بيته سالماً وهو يشكرها.",
+ "عرفت لجين في تلك الليلة أن لكل نجمة ضوءاً خاصاً وعملاً لا يقدر عليه سواها، فصارت تتلألأ كل ليلة سعيدة، مهما كان حجمها."],
+ moral:"لكل إنسان قيمة وموهبة خاصة، فلا تقارن نفسك بغيرك."},
+
+{id:7,cat:"قصص الحكمة",emoji:"🏺",title:"الجرّة المشروخة",time:2,
+ summary:"عيبٌ صغير أنبت زهوراً.",
+ text:[
+ "كان لرجل جرّتان يحمل بهما الماء من النبع إلى بيته كل يوم؛ جرّة سليمة تصل ممتلئة، وجرّة مشروخة يتسرّب نصف مائها في الطريق.",
+ "شعرت الجرّة المشروخة بالخجل وقالت للرجل ذات يوم: «أنا آسفة، فأنا أضيّع نصف الماء ولا أكمل مهمتي كما ينبغي».",
+ "ابتسم الرجل وقال: «انظري إلى جانبي الطريق». نظرت فرأت على الجهة التي تحملها زهوراً جميلة ملوّنة، وأما الجهة الأخرى فلا زهر فيها. قال: «لقد علمت بشقّك منذ البداية، فنثرت البذور على جانبك، وكنتِ تسقينها كل يوم دون أن تدري، ولولاكِ ما زيّنتُ بيتي بتلك الزهور الجميلة».",
+ "ومنذ ذلك اليوم عاشت الجرّة سعيدة بما هي عليه."],
+ moral:"قد يكون ما نظنه عيباً فينا سبباً في خير لا نراه."},
+
+{id:8,cat:"قصص الأطفال",emoji:"🐦",title:"العصفور الشجاع",time:2,
+ summary:"عصفور صغير يتعلّم الطيران.",
+ text:[
+ "في عشّ فوق شجرة زيتون عاش عصفور صغير اسمه «زاهي». كانت أمه تقول له كل صباح: «حان وقت الطيران يا حبيبي»، فيجيب بخوف: «أخشى أن أسقط».",
+ "في أحد الأيام هبّت ريح خفيفة وراحت أوراق الشجر ترقص، فرأى زاهي فراشة جميلة تحلّق بالقرب منه. نسي خوفه وقفز يلحق بها دون تفكير.",
+ "رفرف بجناحيه الصغيرين، فاندفع في الهواء وارتفع قليلاً ثم أكثر! صاح فرحاً: «أنا أطير! أنا أطير!» وراحت أمه تغنّي له من فوق الغصن بسعادة.",
+ "منذ ذلك اليوم لم يعد زاهي يخاف، وصار يزور كل بساتين القرية، ويحكي للعصافير الصغيرة أن الخطوة الأولى أصعب ما في الطريق."],
+ moral:"الخوف يزول حين نجرّب، والخطوة الأولى هي أصعب خطوة."}
+];
+
+/* ---------- state ---------- */
+let cat="الكل", tab="all", cur=null, fs=19;
+const $=id=>document.getElementById(id);
+function load(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+let favs=load("favs",[]);
+fs=load("fs",19);
+if(load("night",false)){document.body.classList.add("night");}
+
+/* ---------- list ---------- */
+function renderChips(){
+  $("chips").innerHTML=CATS.map(c=>`<button class="chip ${c===cat?"on":""}" onclick="setCat('${c}')">${c}</button>`).join("");
+}
+function setCat(c){cat=c;renderChips();render();}
+function setTab(t){tab=t;$("navAll").classList.toggle("on",t==="all");$("navFav").classList.toggle("on",t==="fav");render();$("list").scrollTop=0;}
+function render(){
+  const q=$("q").value.trim();
+  let items=STORIES.filter(s=>(cat==="الكل"||s.cat===cat)&&(tab==="all"||favs.includes(s.id))&&
+    (!q||s.title.includes(q)||s.summary.includes(q)||s.text.join(" ").includes(q)));
+  let html;
+  if(!items.length){
+    html=`<div class="empty">${tab==="fav"?"لم تضف أي قصة إلى المفضلة بعد ❤️<br>اضغط على القلب داخل أي قصة لحفظها هنا.":"لا توجد نتائج مطابقة 🔎"}</div>`;
+  }else{
+    html='<div class="grid">'+items.map(s=>`
+      <button class="card" onclick="openStory(${s.id})">
+        <div class="emoji" style="background:${COLORS[s.id%COLORS.length]}">${s.emoji}</div>
+        <div style="flex:1">
+          <h3>${s.title}</h3>
+          <div class="meta">${s.cat} · ⏱ ${s.time} دقائق</div>
+          <div class="sum">${s.summary}</div>
+        </div>
+        <span class="fav ${favs.includes(s.id)?"on":""}">${favs.includes(s.id)?"❤️":"♡"}</span>
+      </button>`).join("")+'</div>';
+  }
+  html+=`<div class="foot">تصميم <b>مجاهد العزي</b></div>`;
+  $("list").innerHTML=html;
+}
+
+/* ---------- reader ---------- */
+function openStory(id){
+  const s=STORIES.find(x=>x.id===id); if(!s)return;
+  cur=id;
+  $("rtitle").textContent=s.title;
+  $("rbody").style.fontSize=fs+"px";
+  $("rbody").innerHTML=`
+    <div class="hero">${s.emoji}</div>
+    <h1>${s.title}</h1>
+    <div class="by">${s.cat} · ⏱ ${s.time} دقائق</div>
+    ${s.text.map(p=>`<p>${p}</p>`).join("")}
+    <div class="moral"><b>💡 العبرة:</b><br>${s.moral}</div>
+    <div class="rfoot">— النهاية —<br>تصميم <b>مجاهد العزي</b></div>`;
+  $("rbody").scrollTop=0;
+  updFav();
+  $("reader").classList.add("open");
+}
+function closeReader(){$("reader").classList.remove("open");cur=null;render();}
+function updFav(){$("rfav").textContent=favs.includes(cur)?"❤️":"🤍";}
+function toggleFav(id){
+  if(id==null)return;
+  favs=favs.includes(id)?favs.filter(x=>x!==id):[...favs,id];
+  save("favs",favs);updFav();
+}
+function fontSize(d){fs=Math.min(30,Math.max(15,fs+d*2));save("fs",fs);$("rbody").style.fontSize=fs+"px";}
+function randomStory(){openStory(STORIES[Math.floor(Math.random()*STORIES.length)].id);}
+
+/* ---------- misc ---------- */
+function toggleNight(){
+  const n=document.body.classList.toggle("night");save("night",n);
+  $("nightBtn").textContent=n?"☀️":"🌙";
+}
+function openAbout(){$("about").classList.add("open");}
+function closeAbout(){$("about").classList.remove("open");}
+
+/* called by Android back button; return true if handled */
+window.handleBack=function(){
+  if($("about").classList.contains("open")){closeAbout();return true;}
+  if($("reader").classList.contains("open")){closeReader();return true;}
+  if(tab!=="all"){setTab("all");return true;}
+  return false;
+};
+
+$("nightBtn").textContent=document.body.classList.contains("night")?"☀️":"🌙";
+renderChips();render();
+setTimeout(()=>$("splash").classList.add("hide"),2200);
+</script>
+</body>
+</html>
